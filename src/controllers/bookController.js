@@ -24,7 +24,7 @@ const getbook = async function(req,res){
 
 const getUpdatedPrice = async function(req,res){
     
-	let updated = await bookModel.findOneAndUpdate({name: "Five Point Someone"}, {price: 100}, {new: true}) //select({author_id:1, _id:0})
+	let updated = await bookModel.findOneAndUpdate({name: "Two States"}, {price: 100}, {new: true}) //select({author_id:1, _id:0})
     let id = updated.author_id;
     let updatedPrice = updated.price
     console.log(id);
