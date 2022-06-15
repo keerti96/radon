@@ -17,10 +17,10 @@ router.post("/login", userController.loginUser)
 router.get("/getdata", userController.getdata)
 
 //The userId is sent by front end
-router.get("/users/:userId", mid.midAuth, userController.getUserData)
+router.get("/users/:userId",mid.authenticate, mid.authorise, userController.getUserData)
 
-router.put("/users/:userId", mid.midAuth, userController.updateUser)
+router.put("/users/:userId", mid.authenticate, mid.authorise, userController.updateUser)
 
-router.delete("/users/:userId", mid.midAuth, userController.deleteUser)
+router.delete("/users/:userId", mid.authenticate,mid.authorise,  userController.deleteUser)
 
 module.exports = router;
