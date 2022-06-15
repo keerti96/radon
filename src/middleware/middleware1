@@ -1,0 +1,16 @@
+//const moment = require('moment');
+const timestamp = require('time-stamp')
+
+
+const details = async function(req, res, next){
+    const IP = req.ip
+    const routeUrl = req.url
+    //const nowDate = moment().format()
+    const nowDate = timestamp('YYYY/MM/DD:mm:ss')
+
+    console.log(` ${nowDate} ${IP} ${routeUrl}`)
+    res.send("middleware assignment1:  date, IP address and routeUrl details fetched")
+
+}
+
+module.exports.details = details 
