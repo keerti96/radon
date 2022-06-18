@@ -12,15 +12,53 @@ const createAuthor = async function(req,res){
     let data =req.body;
     let saveData = await authorModel.create(data);
     res.send({msg: saveData});
+
 }
+
+
 const getbook = async function(req,res){
-    let authorName= await authorModel.find({author_name:"Chetan Bhagat"})
-    let id =authorName [0].author_id
-    let bookData = await bookModel.find({author_id:id})
+    let id= await authorModel.findOne({author_name:"Chetan Bhagat"}).select({author_id:1 , _id:0})
+    let bookData = await bookModel.find({author_id: id.author_id})
     res.send({msg: bookData})
 }
 
-// additianal question
+const getUpdatedPrice = async function(req,res){
+    
+	let updated = await bookModel.findOneAndUpdate({name: "Five Point Someone"}, {price: 100}, {new: true}) //select({author_id:1, _id:0})
+    let id = updated.author_id;
+    let updatedPrice = updated.price
+    console.log(id);
+
+    let authorData = await authorModel.findOne({author_id: id}).select({author_name:1, _id:0})
+    res.send({msg: authorData, updatedPrice})
+}
+
+
+const getAuthorName = async function (req, res){
+    let bookData = await bookModel.find({price:{$gte:50,$lte:100}}).select({author_id:1, _id:0})
+    
+    let arry=[]
+    for(let i=0; i<bookData.length; i++)
+    {
+        const x = bookData[i]
+        const author = await authorModel.findOne({author_id:x.author_id}).select({author_name:1, _id:0})
+        arry.push(author)
+    }
+    const authorName = arry
+    res.send({bookData,authorName})
+    
+    /*
+    let authorNames = bookData.map(x => await authorModel.findOne({author_id:x.author_id}).select({author_name:1, _id:0}))
+
+    res.send({bookData,authorNames})
+    */
+
+}
+
+
+
+
+// additional question
 const getBooksById = async function (req,res) {
     let authorId = req.params.id
     let savedData = await bookModel.find({author_id : authorId}).select({name:1, _id:0})
@@ -29,13 +67,14 @@ const getBooksById = async function (req,res) {
 }
 
 const getAuthor = async function (req,res) {
-    let bookQuery = await bookModel.find({ratings:{$gt:"4"}}).select({author_id:1, _id:0})
-    let authId = bookQuery.map(inp => inp.author_id)
+    let authId = await bookModel.find({ratings:{$gt:4}}).select({author_id:1, _id:0})
+    //let authId = bookQuery.map(inp => inp.author_id)
     
+
     let temp = []
     for(i=0;i<authId.length;i++) {
         let x = authId[i]
-    let authorQuery = await authorModel.find({ $and: [{author_id : x}, {age: {$gt:"50"}}] }).select({author_name:1, age:1, _id:0})
+    let authorQuery = await authorModel.find({ $and: [{author_id : x.author_id}, {age: {$gt:50}}] }).select({author_name:1, age:1, _id:0})
     temp.push(authorQuery)
     }
     const finalAns = temp.flat()
@@ -43,21 +82,8 @@ const getAuthor = async function (req,res) {
 }
 
 
-// end of 
-const getAuthorName = async function (req, res){
-    const bookData = await bookModel.find({prices:{$gte:50,$lte:100}}).select({name:1, author_id:1 ,price:1, _id:0})
-    const id = bookData.map(input => input.author_id)
-    let arry=[]
-    for(let i=0; i<id.length; i++)
-    {
-        const x = id[i]
-        const author = await authorModel.find({author_id:x}).select({author_name:1,author_id:1 , _id:0})
-        arry.push(...author)
-    }
-    const authorName = arry
-    res.send({bookData,authorName})
-
-}
 
 
-module.exports={getAuthorName,createBook,createAuthor,getbook,getBooksById,getAuthor}
+
+
+module.exports={getAuthorName,createBook,createAuthor,getbook,getBooksById,getAuthor, getUpdatedPrice}

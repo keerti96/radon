@@ -6,7 +6,22 @@ router.post("/createBook",bookController.createBook)
 router.post("/createAuthor",bookController.createAuthor)
 router.get("/getbook",bookController.getbook)
 router.get("/getAuthorName",bookController.getAuthorName)
+router.get("/getUpdatedPrice",bookController.getUpdatedPrice)
+
+
+//additional questions
 router.get("/getAuthor",bookController.getAuthor)
-router.get("/getBooksById",bookController.getBooksById)
+router.get("/getBooksById/:id",bookController.getBooksById)
 
 module.exports = router
+
+
+
+
+
+
+
+
+// //additional questions
+// router.get("/getAuthor",bookController.getAuthor)
+// router.get("/getBooksById",bookController.getBooksById)

@@ -7,7 +7,7 @@ const bookSchema = new mongoose.Schema({
     },
 
     author_id:{
-        type: String,
+        type: Number,
         require: true
     },
     price: Number,
