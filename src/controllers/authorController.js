@@ -1,5 +1,6 @@
 const authorModel=require('../models/authorModel')
 
+//-------------------------------------------CREATE AUTHOR-------------------------------------------------------
 const createAuthor=async function(req,res){
     try{
     const data=req.body
