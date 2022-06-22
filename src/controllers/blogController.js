@@ -1,6 +1,8 @@
 const timestamp = require('time-stamp')
+const jwt = require("jsonwebtoken")
 const authorModel = require('../models/authorModel')
 const blogModel = require('../models/blogModel')
+const TokenExpiredError = require('jsonwebtoken/lib/TokenExpiredError')
 //--------------------------------------------CREATEBLOG-------------------------------------------------------------
 const createBlog = async function (req, res) {
     try {
@@ -36,7 +38,10 @@ const getBlog = async function (req, res) {
             const filter = {}
             if (authorId) {
                 //do we have to check valid id or not
-                filter.authorId = authorId
+                if (await authorModel.findById(authorId))
+                    filter.authorId = authorId
+                else
+                    res.status(400).send({ status: false, msg: "author id is not valid" })
             }
             if (category) {
                 filter.category = category
@@ -59,16 +64,24 @@ const getBlog = async function (req, res) {
 
 //---------------------------------------------AUTHORLOGIN---------------------------------------------------------------
 
-const authorLogin=async function(req ,res){
-    try{
+const authorLogin = async function (req, res) {
+    try {
         const check = req.body
         if (Object.keys(check) == 0) {
             return res.status(400).send({ status: false, msg: "no credentials recieved in request" })
         }
+        const email = req.body.email
+        const password = req.body.password
+        const getData = await authorModel.findOne({ email: email, password: password })
+        if (!getData) {
+            return res.status(401).send({ status: false, msg: "Incorrect email or password" })
+        }
+        const token = jwt.sign({ id: getData._id }, "##k&&k@@s")
+        res.status(200).send({ status: true, token: token })
 
     }
-    catch(err){
-        res.status(500).send({status:false,error:err.message})  
+    catch (err) {
+        res.status(500).send({ status: false, error: err.message })
     }
 }
 
@@ -100,9 +113,9 @@ const updateBlog = async function (req, res) {
         if (req.body.subcategory) {
             update.subcategory = req.body.subcategory
         }
-        update.isPublished='true'
+        update.isPublished = 'true'
         const time = timestamp('YYYY/MM/DD:mm:ss')
-        update.publishedAt=time
+        update.publishedAt = time
         const updateData = await blogModel.findOneAndUpdate({ _id: blogId }, update, { new: true })
         res.status(200).send({ status: true, msg: updateData })
     }
@@ -139,21 +152,21 @@ const deleteById = async function (req, res) {
 
 const deleteBlog = async function (req, res) {
     try {
-       const check=req.query
-       if(Object.keys(check).length==0){
-           res.status(400).send({status:false,msg:"no data recieved in request"})
-       }
-       filter={}
-       if(req.query.category){filter.category=req.query.category}
-       if(req.query.authorId){filter.authorId=req.query.authorId}
-       if(req.query.tags){filter.tags=req.query.tags}
-       if(req.query.subcategory){filter.subcategory=req.query.subcategory}
-      // if(req.query.is){filter.=req.query}
-      const time = timestamp('YYYY/MM/DD:mm:ss')
-      update={isDeleted:true,deletedAt:time}
-      const saveData=await blogModel.updateMany(filter,update)
-      res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
-}
+        const check = req.query
+        if (Object.keys(check).length == 0) {
+            res.status(400).send({ status: false, msg: "no data recieved in request" })
+        }
+        filter = {}
+        if (req.query.category) { filter.category = req.query.category }
+        if (req.query.authorId) { filter.authorId = req.query.authorId }
+        if (req.query.tags) { filter.tags = req.query.tags }
+        if (req.query.subcategory) { filter.subcategory = req.query.subcategory }
+        // if(req.query.is){filter.=req.query}
+        const time = timestamp('YYYY/MM/DD:mm:ss')
+        update = { isDeleted: true, deletedAt: time }
+        const saveData = await blogModel.updateMany(filter, update)
+        res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
+    }
     catch (err) {
         res.status(500).send({ status: false, error: err.message })
     }
@@ -172,5 +185,5 @@ module.exports.createBlog = createBlog
 module.exports.deleteById = deleteById
 module.exports.deleteBlog = deleteBlog
 module.exports.getBlog = getBlog
-module.exports.updateBlog=updateBlog
-module.exports.authorLogin=authorLogin
+module.exports.updateBlog = updateBlog
+module.exports.authorLogin = authorLogin
