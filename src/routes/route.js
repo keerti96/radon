@@ -10,17 +10,17 @@ const mw=require("../middlewares/auth")
 router.post('/authors',authorController.createAuthor)
 
 //----------------------------------------------CREATE BLOG API-----------------------------------------------------
-router.post('/blogs',blogController.createBlog)
+router.post('/blogs',mw.authentication,blogController.createBlog)
 
 //----------------------------------------------GET BLOG API-------------------------------------------------------
-router.get('/blogs',blogController.getBlog)
+router.get('/blogs/:blogId',mw.authentication,blogController.getBlog)
 
 //--------------------------------------------UPDATE BLOG API-------------------------------------------------------
-router.put('/blogs/:blogId',blogController.updateBlog)
+router.put('/blogs/:blogId',mw.authentication,mw.authrization,blogController.updateBlog)
 
 //--------------------------------------------DELETE BLOG API-------------------------------------------------------
-router.delete('/blogs/:blogId',blogController.deleteById)
-router.delete('/blogs',blogController.deleteBlog)
+router.delete('/blogs/:blogId',mw.authentication,mw.authrization,blogController.deleteById)
+router.delete('/blogs',mw.authentication,mw.authrization,blogController.deleteBlog)
 
 //---------------------------------------------AUTHOR LOGIN API------------------------------------------------------
 router.post('/login',blogController.authorLogin)

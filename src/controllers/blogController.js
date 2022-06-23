@@ -72,14 +72,21 @@ const getBlog = async function (req, res) {
 const authorLogin = async function (req, res) {
     try {
         const check = req.body
-        if (Object.keys(check) == 0) {
+        if (Object.keys(check).length == 0) {
             return res.status(400).send({ status: false, msg: "no credentials recieved in request" })
         }
         const email = req.body.email
+        if(!email){
+            return res.status(400).send({ status: false, msg: "no email recieved in request" })
+        }
         if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
-                res.status(400).send({ status: false, message: "Email should be a valid email address" })
-                return}
+                return res.status(400).send({ status: false, message: "Email should be a valid email address" })
+                }
+        
         const password = req.body.password
+        if(!password){
+            return res.status(400).send({ status: false, msg: "no password recieved in request" })  
+        }
         const getData = await authorModel.findOne({ email: email, password: password })
         if (!getData) {
             return res.status(401).send({ status: false, msg: "Incorrect email or password" })
@@ -96,17 +103,18 @@ const authorLogin = async function (req, res) {
 //--------------------------------------------UPDATE BLOG-----------------------------------------------------------
 const updateBlog = async function (req, res) {
     try {
-        const blogId = req.params
-        console.log(blogId)
-        if (!blogId) {
-            return res.status(400).send({ status: false, msg: "please send blogId" })
-        }
-        if (!isValidObjectId(blogId)) {
-            return res.status(400).send({ status: false, msg: "blogId is not valid" })
-        }
-        const validId = await blogModel.findById(blogId)
-        if (!validId)
-            return res.status(404).send({ status: false, msg: "blog of this id not found" })
+        // console.log("hello")
+         const blogId = req.params.blogId
+        // console.log(blogId)
+        // if (!blogId) {
+        //     return res.status(400).send({ status: false, msg: "please send blogId" })//doubt
+        // }
+        // if (!isValidObjectId(blogId)) {
+        //     return res.status(400).send({ status: false, msg: "blogId is not valid" })
+        // }
+        // const validId = await blogModel.findById(blogId)
+        // if (!validId)
+        //     return res.status(404).send({ status: false, msg: "blog of this id not found" })
 
         const check = req.body
         if (Object.keys(check).length == 0) {
