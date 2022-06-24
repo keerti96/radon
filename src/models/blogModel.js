@@ -19,8 +19,7 @@ trim:true},
         //examples[technology-[web development, mobile development, AI, ML etc]] 
     }, 
     //createdAt, updatedAt, 
-    deletedAt: {type:Date
-        //when the document is deleted
+    deletedAt: {type:Date           //when the document is deleted
     }, 
     isDeleted: {type:Boolean, 
         default: false}, 

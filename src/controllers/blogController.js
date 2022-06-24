@@ -2,11 +2,12 @@ const timestamp = require('time-stamp')
 const jwt = require("jsonwebtoken")
 const authorModel = require('../models/authorModel')
 const blogModel = require('../models/blogModel')
-const TokenExpiredError = require('jsonwebtoken/lib/TokenExpiredError')
+//const TokenExpiredError = require('jsonwebtoken/lib/TokenExpiredError')
 const mongoose = require("mongoose")
 const isValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId)
 }
+const verifyPassword=require("../controllers/authorController")
 
 //--------------------------------------------CREATEBLOG-------------------------------------------------------------
 const createBlog = async function (req, res) {
@@ -14,9 +15,26 @@ const createBlog = async function (req, res) {
         const data = req.body
         if (Object.keys(data).length == 0)
             return res.status(400).send({ status: false, msg: "please send the data" })
-        authorid = await authorModel.findById(data.authorId)
-        if (!authorid)
-            return res.status(400).send({ status: false, msg: "enter a valid authorId" })//doubt
+        const { title, body, authorId, tags, category, subcategory } = data
+        if (!title) {
+            return res.status(400).send({ status: false, msg: "Title not recieved it is required" })
+        }
+        if (!body) {
+            return res.status(400).send({ status: false, msg: "body not recieved it is required" })
+        }
+        if (!authorId) {
+            return res.status(400).send({ status: false, msg: "authorId not recieved it is required" })
+        }
+        if (!isValidObjectId(authorId)) {
+            return res.status(400).send({ status: false, msg: "AuthorId is not valid" })
+        }
+        const validId = await authorModel.findById(data.authorId)
+        if (!validId)
+            return res.status(404).send({ status: false, msg: "No Author with this exist" })//doubt
+
+        if (!category) {
+            return res.status(400).send({ status: false, msg: "category not recieved it is required" })
+        }
         const savedData = await blogModel.create(data)
         res.status(201).send({ status: true, msg: savedData })
     }
@@ -76,16 +94,17 @@ const authorLogin = async function (req, res) {
             return res.status(400).send({ status: false, msg: "no credentials recieved in request" })
         }
         const email = req.body.email
-        if(!email){
+        if (!email) {
             return res.status(400).send({ status: false, msg: "no email recieved in request" })
         }
         if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
-                return res.status(400).send({ status: false, message: "Email should be a valid email address" })
-                }
-        
+            return res.status(400).send({ status: false, message: "Email should be a valid email address" })
+        }
+
         const password = req.body.password
-        if(!password){
-            return res.status(400).send({ status: false, msg: "no password recieved in request" })  
+        const result=verifyPassword.verifyPassword(password)
+        if (result!=true) {
+            return res.status(400).send({ status: false, msg: result })
         }
         const getData = await authorModel.findOne({ email: email, password: password })
         if (!getData) {
@@ -104,7 +123,7 @@ const authorLogin = async function (req, res) {
 const updateBlog = async function (req, res) {
     try {
         // console.log("hello")
-         const blogId = req.params.blogId
+        const blogId = req.params.blogId
         // console.log(blogId)
         // if (!blogId) {
         //     return res.status(400).send({ status: false, msg: "please send blogId" })//doubt
@@ -121,7 +140,9 @@ const updateBlog = async function (req, res) {
             return res.status(400).send({ status: false, msg: "no data recieved to update" })
         }
 
-        const { title, body, tags, subcategory } = check
+        let { title, body, tags, subcategory } = check
+        
+     
         const update = {}
         if (title) {
             update.title = title
@@ -129,10 +150,17 @@ const updateBlog = async function (req, res) {
         if (body) {
             update.body = body
         }
+        //if(tags.length==0)   tags=undefined       //doubt
+
         update.isPublished = 'true'
-        const time = timestamp('YYYY/MM/DD:mm:ss')
+        //const time = timestamp('YYYY/MM/DD:mm:ss')
+        const time=Date.now('YYYY/MM/DD:mm:ss')
         update.publishedAt = time
         const updateData = await blogModel.findOneAndUpdate({ _id: blogId }, { $push: { subcategory: subcategory, tags: tags }, $set: update }, { new: true })
+        console.log(updateData)
+        if(!updateData){
+            return res.status(400).send({status:false,msg:" Record not updated "})//doubt
+        }
         res.status(200).send({ status: true, msg: updateData })
     }
     catch (err) {
@@ -146,20 +174,20 @@ const updateBlog = async function (req, res) {
 const deleteById = async function (req, res) {
     try {
         const blogId = req.params.blogId
-        if (!blogId) {
-            return res.status(400).send({ status: false, msg: "please send blogId" })
-        }
-        if (!isValidObjectId(blogId)) {
-            return res.status(400).send({ status: false, msg: "blogId is not valid" })
-        }
-        const validId = await blogModel.findById(blogId)
-        if (!validId)
-            return res.status(404).send({ status: false, msg: "blog of this Id not found" })
+
+       const validId = await blogModel.findById(blogId)
+        
         if (validId.isDeleted === 'true')
             return res.status(404).send({ status: false, msg: "already deleted" })
-        const time = timestamp('YYYY/MM/DD:mm:ss')
+
+        //const time = timestamp('YYYY/MM/DD:mm:ss')
+        const time=Date.now('YYYY/MM/DD:mm:ss')
         const update = { isDeleted: true, deletedAt: time }
+        
         const saveData = await blogModel.findOneAndUpdate({ _id: blogId }, update)
+        // if(!saveData){
+        //     return res.status(400).send({status:false,msg:" Record not updated "})//doubt
+        // }
         res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
 
     }
@@ -176,14 +204,12 @@ const deleteBlog = async function (req, res) {
         if (Object.keys(check).length == 0) {
             res.status(400).send({ status: false, msg: "no data recieved in request" })
         }
-
-        const {category,authorId,tags,subcategory}=check
-
+        const { category, authorId, tags, subcategory } = check
         const filter = {}
-        if (category) 
-        { filter.category = req.query.category }
-        if (authorId) 
-        {
+        filter.authorId = req.authorId
+        filter.isDeleted = false
+        if (category) { filter.category = category }
+        if (authorId) {
             if (!isValidObjectId(authorId)) {
                 return res.status(400).send({ status: false, msg: "not valid authorId" })
             }
@@ -191,16 +217,26 @@ const deleteBlog = async function (req, res) {
                 filter.authorId = authorId
             else
                 res.status(404).send({ status: false, msg: "author of this id not found" })
-         }
-        if (tags) { filter.tags = req.query.tags }
-        if (subcategory) { filter.subcategory = req.query.subcategory }
-     
-        const time = timestamp('YYYY/MM/DD:mm:ss')
-        const update = { isDeleted: false, deletedAt: time }
-        const saveData = await blogModel.updateMany({$or:[filter]}, update)
+        }
+        if (tags) {
+            filter.tags = tags
+        }
+        if (subcategory) {
+            filter.subcategory = subcategory
+        }
+        //const time = timestamp('YYYY/MM/DD:mm:ss')
+        const time = Date.now('YYYY/MM/DD:mm:ss')
+        console.log(time)
+        const update = { isDeleted: true, deletedAt: time }
+        const saveData = await blogModel.updateMany(filter, update)
+        if (saveData.modifiedCount == 0) {
+            return res.status(200).send({ status: false, msg: "resource to be deleted not found " })//doubt
+        }
+        //console.log(saveData)
         res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
     }
     catch (err) {
+        console.log(err)
         res.status(500).send({ status: false, error: err.message })
     }
 }

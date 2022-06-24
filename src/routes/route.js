@@ -20,7 +20,7 @@ router.put('/blogs/:blogId',mw.authentication,mw.authrization,blogController.upd
 
 //--------------------------------------------DELETE BLOG API-------------------------------------------------------
 router.delete('/blogs/:blogId',mw.authentication,mw.authrization,blogController.deleteById)
-router.delete('/blogs',mw.authentication,mw.authrization,blogController.deleteBlog)
+router.delete('/blogs',mw.authentication,mw.authorizationdeleteblog,blogController.deleteBlog)
 
 //---------------------------------------------AUTHOR LOGIN API------------------------------------------------------
 router.post('/login',blogController.authorLogin)

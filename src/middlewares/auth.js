@@ -35,7 +35,7 @@ const authrization = async function (req, res, next) {
     try {
         const blogId = req.params.blogId
         if (!isValidObjectId(blogId)) {
-            return res.status(400).send({ status: false, msg: "blogId is not valid" })
+            return res.status(400).send({ status: false, msg: "blogId is not valid that is in proper format" })
         }
         const validBlog = await blogModel.findById(blogId)
         if (!validBlog)
@@ -56,5 +56,36 @@ const authrization = async function (req, res, next) {
 }
 
 
+//<<-------------------------------------------AUTHORIZATION FOR DELETE BLOG--------------------------------------->>
+const authorizationdeleteblog = async function (req, res,next) {
+    try {
+        let check = req.query
+       if (Object.keys(check).length == 0) {
+            res.status(400).send({ status: false, msg: "no data recieved in request" })
+        }
+        const authorId = req.decodedtoken.id
+        let flag = 0
+        const data = await blogModel.find(check)
+      for (let i = 0; i < data.length; i++) {
+             if (authorId == data[i].authorId) {
+                flag = 1
+                break;
+            }
+        }
+        if (flag == 1) {
+            req.authorId=authorId
+            next()
+        }
+        else {
+            return res.status(403).send({ status: false, msg: 'Author logged in is not allowed to modify the requested blog data' })
+        }
+
+    }
+    catch (err) {
+        res.status(500).send({ status: false, error: err.message })
+    }
+}
+
 module.exports.authentication = authentication
 module.exports.authrization = authrization
+module.exports.authorizationdeleteblog=authorizationdeleteblog
