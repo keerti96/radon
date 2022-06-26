@@ -32,7 +32,7 @@ const verifyPassword = function (password) {
     }
 }
 
-const checkchar=function(temp){
+const checkSpaces=function(temp){
     let check=temp.trim()
      let len =check.length
      if(len==0){
@@ -44,7 +44,7 @@ const checkchar=function(temp){
 //<<-------------------------------------------CREATE AUTHOR---------------------------------------------------->>
 const createAuthor = async function (req, res) {
     try {
-//<<----------------------------------------Validation--------------------------------------------------------->>        
+        //<<----------Validation--------->>       
         const data = req.body
         if (Object.keys(data).length == 0) res.status(400).send({ status: false, msg: "no data send in request" })
 
@@ -53,7 +53,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, message: "fname not recieved it is required" })
         }
 
-      let message=checkchar(fname)
+      let message=checkSpaces(fname)
         if(message!=true){
             return res.status(400).send({status:false,message:"fname  "+message})
         }
@@ -68,7 +68,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, message: "lname not recieved it is required" })
         }
 
-        message=checkchar(lname)
+        message=checkSpaces(lname)
         if(message!=true){
             return res.status(400).send({status:false,message:"lname  "+message})
         }
@@ -98,7 +98,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, message: "email not recieved it is required" })
         }
 
-         message=checkchar(email)
+         message=checkSpaces(email)
         if(message!=true){
             return res.status(400).send({status:false,message:"email  "+message})
         }
@@ -114,7 +114,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, message: "password not recieved it is required" })
         }
 
-         message=checkchar(password)
+         message=checkSpaces(password)
         if(message!=true){
             return res.status(400).send({status:false,message:"password  "+message})
         }
@@ -123,7 +123,7 @@ const createAuthor = async function (req, res) {
         if (result != true) {
             return res.status(400).send({ status: false, message: result })
         }
-//<<------------------------------------------creating Author --------------------------------------------------->>
+        //<<-------creating Author --------->>
         const savedData = await authorModel.create(data)
         res.status(201).send({ status: true, msg: savedData })
     }
@@ -134,4 +134,4 @@ const createAuthor = async function (req, res) {
 
 module.exports.createAuthor = createAuthor
 module.exports.verifyPassword=verifyPassword
-module.exports.checkchar=checkchar
+module.exports.checkSpaces=checkSpaces

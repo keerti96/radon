@@ -14,15 +14,15 @@ const authentication = function (req, res, next) {
             return res.status(401).send({ status: false, msg: "Token missing" })
         }
         const decodedtoken = jwt.verify(token, "##k&&k@@s")
-        //console.log(decodedtoken)
+        
         if (!decodedtoken) {
 
             return res.status(401).send({ status: false, msg: "Token invalid" })
         }
-       // req.headers["authorlogin"]=decodedtoken.id
+     
 
-        req["x-api-key"] = token
-        req.decodedtoken = decodedtoken
+        req["x-api-key"] = decodedtoken
+       
         next()
 
 
@@ -42,14 +42,17 @@ const authrization = async function (req, res, next) {
         const validBlog = await blogModel.findById(blogId)
         if (!validBlog)
             return res.status(404).send({ status: false, msg: "blog with thid blogid not found " })
-        // comapre the logged in author's id and the author id for requested blog
+        
+            // comapre the logged in author's id and the author id for requested blog
         let ownerOfBlog = validBlog.authorId;
+        
         //userId for the logged-in user
-        let authorId = req.decodedtoken.id
+        let authorId = req["x-api-key"].id
+       
         //userId comparision to check if the logged-in user is requesting for their own data
         if (ownerOfBlog != authorId)
             return res.status(403).send({ status: false, msg: 'Author logged in is not allowed to modify the requested blog data' })
-        //req.isDeleted = validBlog.isDeleted;
+        
         next()
     }
     catch (err) {
@@ -65,9 +68,9 @@ const authorizationdeleteblog = async function (req, res,next) {
        if (Object.keys(check).length == 0) {
             res.status(400).send({ status: false, msg: "no data recieved in request" })
         }
-        const authorId = req.decodedtoken.id
+        const authorId = req["x-api-key"].id
         let flag = 0
-        const data = await blogModel.find(check)
+        const data = await blogModel.find(check).select(authorId)
       for (let i = 0; i < data.length; i++) {
              if (authorId == data[i].authorId) {
                 flag = 1

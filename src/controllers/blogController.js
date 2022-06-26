@@ -1,4 +1,3 @@
-const timestamp = require('time-stamp')
 const jwt = require("jsonwebtoken")
 const authorModel = require('../models/authorModel')
 const blogModel = require('../models/blogModel')
@@ -7,7 +6,7 @@ const isValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId)
 }
 const verifyPassword = require("../controllers/authorController")
-const checkchar = require("../controllers/authorController")
+const checkSpaces = require("../controllers/authorController")
 const checkarray = function (arr) {
     let msg = 0
     let flag = 0
@@ -18,10 +17,9 @@ const checkarray = function (arr) {
 
     arr.forEach(element => {
         if (element.trim().length == 0)
-
             flag = 1
-
     });
+
     if (flag == 1) {
         msg = "array element must contain characters other than spaces"
         return msg
@@ -44,7 +42,7 @@ const createBlog = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Title not recieved it is required" })
         }
 
-        let message = checkchar.checkchar(title)
+        let message = checkSpaces.checkSpaces(title)
         if (message != true) {
             return res.status(400).send({ status: false, message: "title  " + message })
         }
@@ -53,7 +51,7 @@ const createBlog = async function (req, res) {
             return res.status(400).send({ status: false, msg: "body not recieved it is required" })
         }
 
-        message = checkchar.checkchar(body)
+        message = checkSpaces.checkSpaces(body)
         if (message != true) {
             return res.status(400).send({ status: false, message: "body  " + message })
         }
@@ -62,7 +60,7 @@ const createBlog = async function (req, res) {
             return res.status(400).send({ status: false, msg: "authorId not recieved it is required" })
         }
 
-        message = checkchar.checkchar(authorId)
+        message = checkSpaces.checkSpaces(authorId)
         if (message != true) {
             return res.status(400).send({ status: false, message: "authorId  " + message })
         }
@@ -78,7 +76,7 @@ const createBlog = async function (req, res) {
             return res.status(400).send({ status: false, msg: "category not recieved it is required" })
         }
 
-        message = checkchar.checkchar(category)
+        message = checkSpaces.checkSpaces(category)
         if (message != true) {
             return res.status(400).send({ status: false, message: "category  " + message })
         }
@@ -86,7 +84,7 @@ const createBlog = async function (req, res) {
         if (tags) {
 
             if (typeof (tags) == 'string') {
-                message = checkchar.checkchar(tags)
+                message = checkSpaces.checkSpaces(tags)
 
                 if (message != true) {
                     return res.status(400).send({ status: false, message: "tags " + message })
@@ -104,7 +102,7 @@ const createBlog = async function (req, res) {
 
         if (subcategory) {
             if (typeof (subcategory) == 'string') {
-                message = checkchar.checkchar(subcategory)
+                message = checkSpaces.checkSpaces(subcategory)
                 if (message != true) {
                     return res.status(400).send({ status: false, message: "subcategory " + message })
                 }
@@ -209,19 +207,16 @@ const authorLogin = async function (req, res) {
 //--------------------------------------------UPDATE BLOG-----------------------------------------------------------
 const updateBlog = async function (req, res) {
     try {
-        // console.log("hello")
+       
         const blogId = req.params.blogId
-        // console.log(blogId)
-        // if (!blogId) {
-        //     return res.status(400).send({ status: false, msg: "please send blogId" })//doubt
-        // }
+        
         // if (!isValidObjectId(blogId)) {
         //     return res.status(400).send({ status: false, msg: "blogId is not valid" })
         // }
         const validId = await blogModel.findById(blogId)
         if (!validId)
             return res.status(404).send({ status: false, msg: "blog of this id not found" })
-       
+
         const check = req.body
         if (Object.keys(check).length == 0) {
             return res.status(400).send({ status: false, msg: "no data recieved to update" })
@@ -229,7 +224,7 @@ const updateBlog = async function (req, res) {
 
         let { title, body, tags, subcategory } = check
         const update = {}
-        
+
         if (title) {
             let message = checkchar.checkchar(title)
             if (message != true) {
@@ -237,7 +232,7 @@ const updateBlog = async function (req, res) {
             }
             update.title = title
         }
-        
+
         if (body) {
             let message = checkchar.checkchar(body)
             if (message != true) {
@@ -246,22 +241,22 @@ const updateBlog = async function (req, res) {
             update.body = body
         }
 
-        
-        if(tags){
+
+        if (tags) {
             let message = checkchar.checkchar(tags)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "tags  " + message })
             }
         }
-       
-       
-        if(subcategory){
+
+
+        if (subcategory) {
             let message = checkchar.checkchar(subcategory)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "subcategory  " + message })
             }
         }
-        
+
         update.isPublished = 'true'
         const time = Date.now('YYYY/MM/DD:mm:ss')
         update.publishedAt = time
@@ -313,7 +308,7 @@ const deleteBlog = async function (req, res) {
         if (Object.keys(check).length == 0) {
             res.status(400).send({ status: false, msg: "no data recieved in request" })
         }
-        const { category, authorId, tags, subcategory,isPublished} = check
+        const { category, authorId, tags, subcategory, isPublished } = check
         const filter = {}
         filter.authorId = req.authorId
         filter.isDeleted = false
@@ -333,8 +328,8 @@ const deleteBlog = async function (req, res) {
         if (subcategory) {
             filter.subcategory = subcategory
         }
-        if(isPublished){
-            filter.isPublished=isPublished
+        if (isPublished) {
+            filter.isPublished = isPublished
         }
         const time = Date.now('YYYY/MM/DD:mm:ss')
 
