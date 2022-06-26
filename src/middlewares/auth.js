@@ -14,10 +14,12 @@ const authentication = function (req, res, next) {
             return res.status(401).send({ status: false, msg: "Token missing" })
         }
         const decodedtoken = jwt.verify(token, "##k&&k@@s")
+        //console.log(decodedtoken)
         if (!decodedtoken) {
 
             return res.status(401).send({ status: false, msg: "Token invalid" })
         }
+       // req.headers["authorlogin"]=decodedtoken.id
 
         req["x-api-key"] = token
         req.decodedtoken = decodedtoken
@@ -35,7 +37,7 @@ const authrization = async function (req, res, next) {
     try {
         const blogId = req.params.blogId
         if (!isValidObjectId(blogId)) {
-            return res.status(400).send({ status: false, msg: "blogId is not valid that is in proper format" })
+            return res.status(400).send({ status: false, msg: "blogId is not valid that is not in proper format" })
         }
         const validBlog = await blogModel.findById(blogId)
         if (!validBlog)
