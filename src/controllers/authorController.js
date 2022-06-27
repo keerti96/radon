@@ -123,9 +123,14 @@ const createAuthor = async function (req, res) {
         if (result != true) {
             return res.status(400).send({ status: false, message: result })
         }
+
+        const mail=await authorModel.find({email:email})
+        if(mail.length!=0){
+            return res.status(400).send({ status: false, message: "email already registered" })
+        }
         //<<-------creating Author --------->>
         const savedData = await authorModel.create(data)
-        res.status(201).send({ status: true, msg: savedData })
+        res.status(201).send({ status: true, data: savedData })
     }
     catch (err) {
         res.status(500).send({ status: false, error: err.message })

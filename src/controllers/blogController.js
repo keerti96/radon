@@ -119,7 +119,7 @@ const createBlog = async function (req, res) {
         
          //<<-------creating Blog--------->>
         const savedData = await blogModel.create(data)
-        res.status(201).send({ status: true, msg: savedData })
+        res.status(201).send({ status: true, data: savedData })
     }
     catch (err) {
         res.status(500).send({ status: false, error: err.message })
@@ -160,7 +160,7 @@ const getBlog = async function (req, res) {
         if (savedData.length == 0) {
             return res.status(404).send({ status: false, msg: "no record found" })
         }
-        return res.status(200).send({ status: true, msg: savedData })
+        return res.status(200).send({ status: true, data: savedData })
 
     }
     catch (err) {
@@ -202,7 +202,7 @@ const authorLogin = async function (req, res) {
 
          //<<-------generating token --------->>
         const token = jwt.sign({ id: getData._id }, "##k&&k@@s")
-        res.status(200).send({ status: true, token: token })
+        res.status(200).send({ status: true, data: token })
 
     }
     catch (err) {
@@ -273,7 +273,7 @@ const updateBlog = async function (req, res) {
         if (!updateData) {
             return res.status(404).send({ status: false, msg: " Record not updated " })
         }
-        res.status(200).send({ status: true, msg: updateData })
+        res.status(200).send({ status: true, data: updateData })
     }
     catch (err) {
         console.log(err)
@@ -301,7 +301,7 @@ const deleteById = async function (req, res) {
         if(!saveData){
             return res.status(400).send({status:false,msg:" Record not updated "})
         }
-        res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
+        res.status(200).send({ status: true, data: "Deleted Sucessfully" })
 
     }
     catch (err) {
@@ -350,7 +350,7 @@ const deleteBlog = async function (req, res) {
             return res.status(404).send({ status: false, msg: "resource to be deleted not found " })
         }
         
-        res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
+        res.status(200).send({ status: true, data: "Deleted Sucessfully" })
     }
     catch (err) {
         console.log(err)
