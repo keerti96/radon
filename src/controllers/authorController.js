@@ -83,7 +83,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, message: "title not recieved it is required" })
         }
 
-         message=checkchar(title)
+         message=checkSpaces(title)
         if(message!=true){
             return res.status(400).send({status:false,message:"title  "+message})
         }

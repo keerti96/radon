@@ -70,7 +70,7 @@ const authorizationdeleteblog = async function (req, res,next) {
         }
         const authorId = req["x-api-key"].id
         let flag = 0
-        const data = await blogModel.find(check).select(authorId)
+        const data = await blogModel.find(check)
       for (let i = 0; i < data.length; i++) {
              if (authorId == data[i].authorId) {
                 flag = 1

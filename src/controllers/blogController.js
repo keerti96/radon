@@ -32,6 +32,7 @@ const checkarray = function (arr) {
 //--------------------------------------------CREATEBLOG-------------------------------------------------------------
 const createBlog = async function (req, res) {
     try {
+        //<<----------Validation--------->>  
         const data = req.body
         if (Object.keys(data).length == 0)
             return res.status(400).send({ status: false, msg: "please send the data" })
@@ -115,7 +116,8 @@ const createBlog = async function (req, res) {
                 }
             }
         }
-
+        
+         //<<-------creating Blog--------->>
         const savedData = await blogModel.create(data)
         res.status(201).send({ status: true, msg: savedData })
     }
@@ -153,8 +155,9 @@ const getBlog = async function (req, res) {
             filter.subcategory = subcategory
         }
 
+         //<<-------Finding Blog--------->>
         const savedData = await blogModel.find(filter).populate("authorId")
-        if (Object.keys(savedData).length == 0) {
+        if (savedData.length == 0) {
             return res.status(404).send({ status: false, msg: "no record found" })
         }
         return res.status(200).send({ status: true, msg: savedData })
@@ -170,6 +173,7 @@ const getBlog = async function (req, res) {
 
 const authorLogin = async function (req, res) {
     try {
+        //<<----------Validation--------->>  
         const check = req.body
         if (Object.keys(check).length == 0) {
             return res.status(400).send({ status: false, msg: "no credentials recieved in request" })
@@ -183,7 +187,7 @@ const authorLogin = async function (req, res) {
         }
 
         const password = req.body.password
-        let message = checkchar.checkchar(password)
+        let message = checkSpaces.checkSpaces(password)
         if (message != true) {
             return res.status(400).send({ status: false, message: "password  " + message })
         }
@@ -195,6 +199,8 @@ const authorLogin = async function (req, res) {
         if (!getData) {
             return res.status(401).send({ status: false, msg: "Incorrect email or password" })
         }
+
+         //<<-------generating token --------->>
         const token = jwt.sign({ id: getData._id }, "##k&&k@@s")
         res.status(200).send({ status: true, token: token })
 
@@ -207,17 +213,17 @@ const authorLogin = async function (req, res) {
 //--------------------------------------------UPDATE BLOG-----------------------------------------------------------
 const updateBlog = async function (req, res) {
     try {
-       
+       //<<----------Validation--------->>  
         const blogId = req.params.blogId
         
         // if (!isValidObjectId(blogId)) {
         //     return res.status(400).send({ status: false, msg: "blogId is not valid" })
         // }
-        const validId = await blogModel.findById(blogId)
-        if (!validId)
-            return res.status(404).send({ status: false, msg: "blog of this id not found" })
+        // const validId = await blogModel.findById(blogId)
+        // if (!validId)
+        //     return res.status(404).send({ status: false, msg: "blog of this id not found" })
 
-        const check = req.body
+         const check = req.body
         if (Object.keys(check).length == 0) {
             return res.status(400).send({ status: false, msg: "no data recieved to update" })
         }
@@ -226,7 +232,7 @@ const updateBlog = async function (req, res) {
         const update = {}
 
         if (title) {
-            let message = checkchar.checkchar(title)
+            let message = checkSpaces.checkSpaces(title)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "title  " + message })
             }
@@ -234,7 +240,7 @@ const updateBlog = async function (req, res) {
         }
 
         if (body) {
-            let message = checkchar.checkchar(body)
+            let message = checkSpaces.checkSpaces(body)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "body  " + message })
             }
@@ -243,7 +249,7 @@ const updateBlog = async function (req, res) {
 
 
         if (tags) {
-            let message = checkchar.checkchar(tags)
+            let message = checkSpaces.checkSpaces(tags)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "tags  " + message })
             }
@@ -251,7 +257,7 @@ const updateBlog = async function (req, res) {
 
 
         if (subcategory) {
-            let message = checkchar.checkchar(subcategory)
+            let message = checkSpaces.checkSpaces(subcategory)
             if (message != true) {
                 return res.status(400).send({ status: false, message: "subcategory  " + message })
             }
@@ -260,10 +266,12 @@ const updateBlog = async function (req, res) {
         update.isPublished = 'true'
         const time = Date.now('YYYY/MM/DD:mm:ss')
         update.publishedAt = time
+
+         //<<-------Updating Blog--------->>
         const updateData = await blogModel.findOneAndUpdate({ _id: blogId }, { $push: { subcategory: subcategory, tags: tags }, $set: update }, { new: true })
-        console.log(updateData)
+        
         if (!updateData) {
-            return res.status(404).send({ status: false, msg: " Record not updated " })//doubt
+            return res.status(404).send({ status: false, msg: " Record not updated " })
         }
         res.status(200).send({ status: true, msg: updateData })
     }
@@ -284,14 +292,15 @@ const deleteById = async function (req, res) {
         if (validId.isDeleted === 'true')
             return res.status(404).send({ status: false, msg: "already deleted" })
 
-        //const time = timestamp('YYYY/MM/DD:mm:ss')
+        
         const time = Date.now('YYYY/MM/DD:mm:ss')
         const update = { isDeleted: true, deletedAt: time }
 
+         //<<-------deleting Blog--------->>
         const saveData = await blogModel.findOneAndUpdate({ _id: blogId }, update)
-        // if(!saveData){
-        //     return res.status(400).send({status:false,msg:" Record not updated "})//doubt
-        // }
+        if(!saveData){
+            return res.status(400).send({status:false,msg:" Record not updated "})
+        }
         res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
 
     }
@@ -334,11 +343,13 @@ const deleteBlog = async function (req, res) {
         const time = Date.now('YYYY/MM/DD:mm:ss')
 
         const update = { isDeleted: true, deletedAt: time }
+
+        //<<-------deleting Blog--------->>
         const saveData = await blogModel.updateMany(filter, update)
         if (saveData.modifiedCount == 0) {
-            return res.status(404).send({ status: false, msg: "resource to be deleted not found " })//doubt
+            return res.status(404).send({ status: false, msg: "resource to be deleted not found " })
         }
-        //console.log(saveData)
+        
         res.status(200).send({ status: true, msg: "Deleted Sucessfully" })
     }
     catch (err) {
@@ -347,19 +358,7 @@ const deleteBlog = async function (req, res) {
     }
 }
 
-// const deleteById=async function(req res){
-//     try{
 
-//     }
-//     catch(err){
-//         res.status(500).send({status:false,error:err.message})  
-//     }
-// }
-
-// if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
-//     res.status(400).send({ status: false, message: "Email should be a valid email address" })
-//     return
-// }
 
 
 module.exports.createBlog = createBlog
