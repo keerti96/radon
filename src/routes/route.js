@@ -6,11 +6,9 @@ const controller = require("../controllers/controller")
 
 
 
-router.post("/functionup/colleges", controller.createCollage )
+router.post("/functionup/colleges", controller.createCollege )
 
-// router.post("/functionup/interns", controller.createIntern)
 
-// router.get("/functionup/collegeDetails", controller.getCOllageDetails)
 
 
 module.exports = router;

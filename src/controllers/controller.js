@@ -4,4 +4,3 @@ const collegeModel = require("../models/collegeModel")
 const mongoose = require("mongoose")
 
 
-
