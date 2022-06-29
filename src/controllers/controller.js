@@ -7,8 +7,8 @@ const mongoose = require("mongoose")
 //     return mongoose.Types.ObjectId.isValid(objectId)
 // }
 
-const isValidRequestBody = function(requestBody){
-    return Object.keys(data).length > 0;
+const isValidRequestBody = function (requestBody){
+    return Object.keys(requestBody).length > 0;
 }
 
 
@@ -16,6 +16,8 @@ const createCollege = async function (req, res) {
     try{
         //<<----------Validation of request body parameters--------->>  
         const requestBody = req.body
+        console.log(requestBody)
+
         if (!isValidRequestBody(requestBody)){
             return res.status(400).send({ status: false, msg: "Request body is empty!! Please provide the college details" })
         }
