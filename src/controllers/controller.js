@@ -98,14 +98,18 @@ let internData = async function (req, res) {
 let collegeDetails = async function (req, res)  {
     try {
         let query = req.query.collegeName
-        
-        let val = validate.checkerIntern(query)
-        if (val) {
-            return res.status(400).send({ status: false, message: val })
-        }
 
-      
+
+        if (!validate.isValid(query)) {
+           return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
+            ;
+        }
         query=query.toLowerCase()
+
+        if (!query.match(/^[a-z,_,-]+$/)) {
+           return res.status(400).send({ status: false, message: "Name should be in valid format" })
+            ;
+        }
 
         let specificCollege = await collegeModel.findOne({ name: query })
         if (!specificCollege) {

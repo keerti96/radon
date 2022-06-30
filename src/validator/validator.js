@@ -85,19 +85,19 @@ const checkerCollege = function (name, fullName, logoLink) {
     }
 }
 
-const checkerIntern = function (query) {
-            //validation starts
-            if (!validate.isValid(query)) {
-                return "Invalid request parameters. Please provide intern details" ;
-            }
-            if (!query.match(/^[a-z,_,-]+$/)) {
-                return "Name should be in valid format" ;
-            }
+// const checkerIntern = function (query) {
+//             //validation starts
+//             if (!isValid(query)) {
+//                 return "Invalid request parameters. Please provide intern details" ;
+//             }
+//             if (!query.match(/^[a-z,_,-]+$/)) {
+//                 return "Name should be in valid format" ;
+//             }
            
-}
+// }
 
 
 
 
-module.exports = { checker, isValid, isValidrequestBody, checkerCollege,checkerIntern }
+module.exports = { checker, isValid, isValidrequestBody, checkerCollege }
 
