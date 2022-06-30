@@ -48,7 +48,8 @@ const createCollege = async function (req, res) {
 //================================================**Post Api : To create intern data**===========================================================//
 let internData = async  function (req, res){
     try {
-        const { name, email, mobile, collegeName } = req.body
+        let { name, email, mobile, collegeName } = req.body
+        collegeName=collegeName.toLowerCase();
 
          //validations starts
         if (!validate.isValidrequestBody(req.body)) {
@@ -99,7 +100,8 @@ let internData = async  function (req, res){
 
 let collegeDetails = async  (req, res) => {
     try {
-        let query = req.query.collegeName
+        let query = req.query.collegeName.toLowerCase()
+
 
         //validation starts
         if (!validate.isValid(query)) {
@@ -117,7 +119,9 @@ let collegeDetails = async  (req, res) => {
         }
 
         let id = specificCollege._id.toString()
-        let intern = await internModel.find({ collegeId: id, isDeleted: false })
+        let intern = await internModel.find({ collegeId: id, isDeleted: false }).select({_id:1,name:1,
+            email:1,
+            mobile:1})
 
         if(!validate.isValidrequestBody(intern)){
             return res.status(400).send({status:false, message: "no intern is regestered"});
@@ -128,7 +132,7 @@ let collegeDetails = async  (req, res) => {
             name: specificCollege.name,
             fullName: specificCollege.fullName,
             logoLink: specificCollege.logoLink,
-            interests: intern                                   //array in intern
+            interns: intern                                   //array in intern
         }
         return res.status(200).send({ status: true, data: data })
     } catch (err) {

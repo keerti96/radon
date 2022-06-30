@@ -14,7 +14,12 @@ let validateEmail = function(email) {
 };
 
 const internSchema = new mongoose.Schema(
+
   {
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
       required: "name is a required field",
@@ -27,7 +32,7 @@ const internSchema = new mongoose.Schema(
       validate: [validateEmail, 'please fill the valid Email address']
     },
     mobile: {
-      type: Number,
+      type: String,
       required: "mobile is a required field",
       unique: true,
       validate: [validateNumber, 'please fill the valid Mobile Number']
@@ -37,10 +42,7 @@ const internSchema = new mongoose.Schema(
       ref: "College",
       trim: true,
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+  
   },
   { timestamps: true }
 );

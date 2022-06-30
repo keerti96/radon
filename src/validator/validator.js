@@ -1,5 +1,5 @@
-const collegeModel = require("../models/collegeModel")
-const internModel = require("../models/internModel")
+// const collegeModel = require("../models/collegeModel")
+// const internModel = require("../models/internModel")
 const mongoose = require("mongoose");
 
 const isValid = function (value) {
