@@ -1,19 +1,40 @@
 const collegeModel = require("../models/collegeModel")
 const internModel = require("../models/internModel")
-// const internModel = require("../models/internModel")
-
+const validate = require("../validator/validator.js")
 const createCollege = async function (req, res) {
-    try {
+    try{
         //<<----------Validation of request body parameters--------->>  
         const requestBody = req.body
-        console.log(requestBody)
+   
 
-        if (!isValidRequestBody(requestBody)) {
-            return res.status(400).send({ status: false, msg: "Request body is empty!! Please provide the college details" })
+        if (!validate.isValidrequestBody(requestBody)){
+            return res.status(400).send({ status: false, message: "Request body is empty!! Please provide the college details" })
         }
 
+        const {name, fullName, logoLink} = requestBody;
+
+        if(!validate.isValid(name)){
+            return res.status(400).send({ status: false, message: "Please provide the name of college" })
+        }
+
+        if(!validate.isValid(fullName)){
+            return res.status(400).send({ status: false, message: "Please provide the fullName of college" })
+        }
+
+        if(!validate.isValid(logoLink)){
+            return res.status(400).send({ status: false, message: "Please provide the logoLink of college" })
+        }
+
+        //----check if name is unique
+        const nameCheck=await collegeModel.find({name:name})
+        if(nameCheck.length!=0){
+            return res.status(400).send({ status: false, message: "this name(abbr) already exists" })
+        }
+
+
+        //<----create a college document---->
         const savedData = await collegeModel.create(requestBody)
-        res.status(201).send({ status: true, data: savedData })
+        return res.status(201).send({ status: true, data: savedData })
     }
     catch (err) {
         res.status(500).send({ status: false, error: err.message })
@@ -22,66 +43,38 @@ const createCollege = async function (req, res) {
 }
 
 //================================================**Post Api : To create intern data**===========================================================//
-let internData = async  (req, res) =>{
+let internData = async  function (req, res){
     try {
         const { name, email, mobile, collegeName } = req.body
 
          //validations starts
-        if (!isValidrequestBody(req.body)) {
-            res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
-            return;
+        if (!validate.isValidrequestBody(req.body)) {
+            return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
+            ;
+        }
+       let val= validate.checker(name,email,mobile,collegeName)
+        if(val){
+           return res.status(400).send({ status: false, message: val })
         }
 
-        if (!isValid(name)) {
-            res.status(400).send({ status: false, message: "Name is required" })
-            return;
-        }
-        if (!/^[a-z,',-]+(\s)[a-z,',-]+$/i.test(name)) {
-            res.status(400).send({ status: false, message: "Name should be in valid format" })
-            return;
-        }
-
-        if (!isValid(email)) {
-            res.status(400).send({ status: false, message: "email is required" })
-            return;
-        }
-        if (!/^[a-z0-9]{1,}@g(oogle)?mail\.com$/.test(email)) {
-            res.status(400).send({ status: false, message: "Email should be in valid format" })
-            return;
-        }
-
-        const emailUsed = await internModel.findOne({ email: email })
-        if (emailUsed) {
-            res.status(400).send({ status: false, message: "Email is already registered" })
-            return;
-        }
-
-        if (!isValid(mobile)) {
-            res.status(400).send({ status: false, message: "Number is required" })
-            return;
-        }
-        if (!/^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/.test(mobile)) {
-            res.status(400).send({ status: false, message: "Mobile number should be in valid format" })
-            return;
-        }
-
+       
         const isMobile = await internModel.findOne({ mobile: mobile });
 
         if (isMobile) {
-            res.status(400).send({ status: false, message: "Mobile number already registered" })
-            return;
+            return res.status(400).send({ status: false, message: "Mobile number already registered" })
+            ;
+        }
+        const emailUsed = await internModel.findOne({ email: email })
+         if (emailUsed) {
+        return  res.status(400).send({ status: false, message:"Email is already registered" })
+        
         }
 
-        if(!collegeName){
-            res.status(400).send({ status: false, message: "collegeName is required" })
-            return;
-
-        }
         
         const doc = await collegeModel.findOne({name:collegeName})
         if(!doc){
-            res.status(400).send({ status: false, message: "collegeName is not registered" })
-            return;
+            return res.status(404).send({ status: false, message: "collegeName is not registered" })
+            ;
         }
 
         //validation ends
@@ -106,26 +99,25 @@ let collegeDetails = async  (req, res) => {
         let query = req.query.collegeName
 
         //validation starts
-        if (!isValid(query)) {
-            res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
-            return;
+        if (!validate.isValid(query)) {
+           return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide intern details" })
+            ;
         }
-        if (!query.match(/^[a-z]+$/)) {
-            res.status(400).send({ status: false, message: "Name should be in valid format" })
-            return;
+        if (!query.match(/^[a-z,_,-]+$/)) {
+           return res.status(400).send({ status: false, message: "Name should be in valid format" })
+            ;
         }
         let specificCollege = await collegeModel.findOne({ name: query })
         if (!specificCollege) {
-            res.status(400).send({ status: true, message: "No college exists with that name" })
-            return;
+           return res.status(400).send({ status: true, message: "No college exists with that name" })
+            ;
         }
 
         let id = specificCollege._id.toString()
         let intern = await internModel.find({ collegeId: id, isDeleted: false })
 
-        if(!isValidrequestBody(intern)){
-            res.status(400).send({status:false, message: "no intern is regestered"})
-            return;
+        if(!validate.isValidrequestBody(intern)){
+            return res.status(400).send({status:false, message: "no intern is regestered"});
         }
         
         //validations ends 
@@ -141,10 +133,6 @@ let collegeDetails = async  (req, res) => {
     }
 }
 
-
-const isValidRequestBody = function (requestBody) {
-    return Object.keys(requestBody).length > 0;
-}
 
 
 
