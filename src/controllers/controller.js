@@ -5,6 +5,8 @@ const createCollege = async function (req, res) {
     try{
         //<<----------Validation of request body parameters--------->>  
         const requestBody = req.body
+        requestBody.name=requestBody.name.toLowerCase().split(" ").join("");
+   
    
 
         if (!validate.isValidrequestBody(requestBody)){
@@ -30,7 +32,8 @@ const createCollege = async function (req, res) {
         if(nameCheck.length!=0){
             return res.status(400).send({ status: false, message: "this name(abbr) already exists" })
         }
-
+        if (!/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(requestBody.logoLink))
+        return res.status(400).send({ status: false, message: "Please provide valid link" })
 
         //<----create a college document---->
         const savedData = await collegeModel.create(requestBody)

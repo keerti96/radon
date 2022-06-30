@@ -35,10 +35,10 @@ const checker=function (name,email,mobile,collegeName){
     if(missdata){
         return missdata+" is missing"
     }
-    if (!/^[a-z,',-]+(\s)[a-z,',-]+$/i.test(name)) {
-        missdata=missdata+"Name is invalid " 
+    // if (!/^[a-z,',-]+(\s)[a-z,',-]+$/i.test(name)) {
+    //     missdata=missdata+"Name is invalid " 
        
-    }
+    // }
 
   
     if (!/^[a-z0-9]{1,}@g(oogle)?mail\.com$/.test(email)) {
