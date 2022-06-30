@@ -79,10 +79,10 @@ const checkerCollege = function (name, fullName, logoLink) {
         return missdata = missdata +  " Please provide valid link" 
     }
 
-    if (!name.match(/^[a-z,_,-]+$/)) {
-        return  "Name should be in valid format"
+    // if (!name.match(/^[a-z,_,-]+$/)) {
+    //     return  "Name should be in valid format"
 
-    }
+    // }
 }
 
 // const checkerIntern = function (query) {
