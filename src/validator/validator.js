@@ -79,11 +79,11 @@ const checkerCollege = function (name, fullName, logoLink) {
     //  }
     if (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(fullName)) {
         missdata = missdata +  "Fullname cannot have special charaters.   "}
-    else if (/\d/.test(data.fullName)) {
+    else if (/\d/.test(fullName)) {
         missdata = missdata + "Fullname cannot have numbers.   "}
             
 
-    if (!name.match(/^[A-Za-z,_,-]+$/)) {
+    if (!name.match(/^[A-Z,a-z,_,-]+$/)) {
         missdata = missdata +  " Name should be in valid format"
     }
     if (!/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(logoLink)){
@@ -91,7 +91,7 @@ const checkerCollege = function (name, fullName, logoLink) {
     }
 
  
-    if(missdata){return missdata +"  is missing"};
+    if(missdata){return missdata };
 }
 
 // const checkerIntern = function (query) {

@@ -5,8 +5,10 @@ const collegeSchema = new mongoose.Schema(
     name: {
       type: String,
       unique: true,
+
       required: "college's name(short form) is required",
-      // required:true
+      trim: true,
+      
     },
     fullName: {
       type: String,
