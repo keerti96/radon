@@ -5,9 +5,11 @@ const controller = require("../controllers/controller")
 
 
 
+router.post("/functionup/colleges", controller.createCollege )
 
-router.get("/functionup/colleges", controller.getCollege )
+router.post("/functionup/interns", controller.internData )
 
+router.get("/functionup/collegeDetails", controller.collegeDetails )
 
 
 
