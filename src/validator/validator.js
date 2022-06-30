@@ -28,7 +28,7 @@ const checker = function (name, email, mobile, collegeName) {
         missdata = missdata + " , " + "mobile"
 
     }
-    if (!collegeName) {
+    if (!isValid(collegeName)) {
         missdata = missdata + " , " + "collegeName"
 
     }
@@ -46,7 +46,9 @@ const checker = function (name, email, mobile, collegeName) {
 
     }
 
-
+    if (!collegeName.match(/^[A-Za-z,_,-]+$/)) {
+        missdata = missdata +  " Name should be in valid format"
+    }
 
     if (!/^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/.test(mobile)) {
         missdata = missdata + "Mobile number should be in valid format"
@@ -75,14 +77,21 @@ const checkerCollege = function (name, fullName, logoLink) {
     //     missdata=missdata+ " name cannot have numbers.   "
        
     //  }
+    if (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(fullName)) {
+        missdata = missdata +  "Fullname cannot have special charaters.   "}
+    else if (/\d/.test(data.fullName)) {
+        missdata = missdata + "Fullname cannot have numbers.   "}
+            
+
+    if (!name.match(/^[A-Za-z,_,-]+$/)) {
+        missdata = missdata +  " Name should be in valid format"
+    }
     if (!/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(logoLink)){
-        return missdata = missdata +  " Please provide valid link" 
+         missdata = missdata +  " Please provide valid link" 
     }
 
-    // if (!name.match(/^[a-z,_,-]+$/)) {
-    //     return  "Name should be in valid format"
-
-    // }
+ 
+    if(missdata){return missdata +"  is missing"};
 }
 
 // const checkerIntern = function (query) {
