@@ -45,7 +45,9 @@ const checker = function (name, email, mobile, collegeName) {
         missdata = missdata + "Email is invalid"
 
     }
-
+    if (!name.match(/^[A-Z,a-z, ,]+$/)) {
+        missdata = missdata +  " Name should be in valid format"
+    }
     if (!collegeName.match(/^[A-Za-z,_,-]+$/)) {
         missdata = missdata +  " Name should be in valid format"
     }
@@ -77,7 +79,7 @@ const checkerCollege = function (name, fullName, logoLink) {
     //     missdata=missdata+ " name cannot have numbers.   "
        
     //  }
-    if (/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(fullName)) {
+    if (/[`!@#$%^*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(fullName)) {
         missdata = missdata +  "Fullname cannot have special charaters.   "}
     else if (/\d/.test(fullName)) {
         missdata = missdata + "Fullname cannot have numbers.   "}
