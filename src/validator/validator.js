@@ -49,7 +49,7 @@ const checker = function (name, email, mobile, collegeName) {
         missdata = missdata +  " Name should be in valid format"
     }
     if (!collegeName.match(/^[A-Za-z,_,-]+$/)) {
-        missdata = missdata +  " Name should be in valid format"
+        missdata = missdata +  " college name should be in valid format"
     }
 
     if (!/^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/.test(mobile)) {

@@ -122,9 +122,9 @@ let collegeDetails = async function (req, res)  {
             mobile: 1
         })
 
-        if (!validate.isValidrequestBody(intern)) {
-            return res.status(400).send({ status: false, message: "no intern is regestered" });
-        }
+        // if (!validate.isValidrequestBody(intern)) {
+        //     return res.status(400).send({ status: false, message: "no intern is regestered" });
+        // }
 
         let data = {                                             //new object 
             name: specificCollege.name,
@@ -137,8 +137,6 @@ let collegeDetails = async function (req, res)  {
         res.status(500).send({ status: false, message: err.message })
     }
 }
-
-
 
 
 
