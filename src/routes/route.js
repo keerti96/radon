@@ -1,34 +1,11 @@
 const express =require('express');
-const { createUrl } = require('../controllers/urlController');
+const {createUrlValidation, createUrl,getUrl } = require('../controllers/urlController');
 const router=express.Router()
 
 
 
-router.post('/url/shorten',createUrl)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+router.post('/url/shorten',createUrlValidation,createUrl)
+router.get('/:urlCode',getUrl)
 
 
 
