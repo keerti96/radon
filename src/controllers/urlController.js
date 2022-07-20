@@ -34,12 +34,12 @@ const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
 const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 
-const isValidData = function (value) {
-    if (typeof value === "undefined" || value === null) return false
-    if (typeof value !== "string") return false;
-    if (typeof value === "string" && value.trim().length == 0) return false;
-    return true;
-}
+// const isValidData = function (value) {
+//     if (typeof value === "undefined" || value === null) return false
+//     if (typeof value !== "string") return false;
+//     if (typeof value === "string" && value.trim().length == 0) return false;
+//     return true;
+// }
 
 function isUrl(x){
     const regEx = /^\s*http[s]?:\/\/([w]{3}\.)?[a-zA-Z0-9]+\.[a-z]{2,3}(\.[a-z]{2})?(\/[\w\-!:@#$%^&*()+=?\.]*)*\s*$/;
@@ -89,7 +89,7 @@ const createUrl = async function (req, res) {
 
         let cahcedProfileData = await GET_ASYNC(`${longUrl}`)
         if (cahcedProfileData) {
-          return  res.status(200).send({status:false,message:"LongUrl is already  present",data:cahcedProfileData})
+          return  res.status(200).send({status:true,message:"LongUrl is already  present",data:cahcedProfileData})
        }else{
         let urlData = await urlModel.findOne({ longUrl: longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 });
         //console.log(urlData)
@@ -131,16 +131,17 @@ const createUrl = async function (req, res) {
 
 const getUrl = async function (req, res) {
     try {
-        let urlCode = req.params.urlCode;
-        let cahcedProfileData = await GET_ASYNC(`${req.params.urlCode}`)
+        let urlCode = req.params.urlCode;//validating url Code
+
+        let cahcedProfileData = await GET_ASYNC(`${urlCode}`)
         if (cahcedProfileData) {
              //console.log('From cache')
-           return  res.send(cahcedProfileData)
+           return  res.status(302).redirect(JSON.parse(cahcedProfileData))
         }
         else {
             let urlData = await urlModel.findOne({ urlCode: urlCode });
             console.log(urlData)
-            await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(urlData))
+            await SET_ASYNC(`${urlCode}`, JSON.stringify(urlData))
 
             if (!urlData) {
                return  res.status(404).send({ status: false, message: "urlCode not found!" });
