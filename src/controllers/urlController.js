@@ -34,12 +34,12 @@ const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
 const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 
-// const isValidData = function (value) {
-//     if (typeof value === "undefined" || value === null) return false
-//     if (typeof value !== "string") return false;
-//     if (typeof value === "string" && value.trim().length == 0) return false;
-//     return true;
-// }
+const isValidData = function (value) {
+    if (typeof value === "undefined" || value === null) return false
+    if (typeof value !== "string") return false;
+    if (typeof value === "string" && value.trim().length == 0) return false;
+    return true;
+}
 
 function isUrl(x){
     const regEx = /^\s*http[s]?:\/\/([w]{3}\.)?[a-zA-Z0-9]+\.[a-z]{2,3}(\.[a-z]{2})?(\/[\w\-!:@#$%^&*()+=?\.]*)*\s*$/;
@@ -58,7 +58,7 @@ const createUrlValidation = async function (req, res, next) {
         return res.status(400).send({ status: false, msg: "Body cannot be empty" });
 
     if (!isValidData(longUrl))
-        return res.status(400).send({ status: false, msg: "Enter a valid longUrl format" });
+        return res.status(400).send({ status: false, msg: "Enter a valid longUrl " });
 
      if(!isUrl(longUrl)) return res.status(400).send({status:false, message:"enter a valid URL"});  
     // if(!valid_url.isUri(longUrl))
