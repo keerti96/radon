@@ -17,6 +17,8 @@ const urlSchema = new mongoose.Schema({
         lowercase:true,
         trim:true
     },
+   // __v: { type: Number, select: false}
 },{timestamps:true})
+
 
 module.exports = mongoose.model("url",urlSchema)
