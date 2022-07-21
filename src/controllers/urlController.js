@@ -19,60 +19,29 @@ redisClient.on("connect", async function () {
     console.log("Connected to Redis..");
 });
 
-const isValidRequestBody = function (requestBody) {
-    if (Object.keys(requestBody).length == 0) return false;
-    return true
-}
+
 
 
 const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
 const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 
-const isValidData = function (value) {
-    if (typeof value === "undefined" || value === null) return "field is missing"
-    if (typeof value !== "string") return "type is not string";
-    if (typeof value === "string" && value.trim().length == 0) return "empty string";
-    return true;
+
+
+const flushw = (req, res) => {
+    redisClient.flushall("ASYNC", (err, data) => {
+        if (err)
+            console.log(err)
+        else if (data)
+            console.log("Memory flushed: ", data)
+    })
+    res.status(200).send({ msg: "redis memory cleared" })
 }
-
-function isUrl(x) {
-    const regEx = /^\s*http[s]?:\/\/([w]{3}\.)?[a-zA-Z0-9]+\.[a-z]{2,3}(\.[a-z]{2})?(\/[\w\-!:@#$%^&*()+=?\.]*)*\s*$/;
-    return regEx.test(x)
-}
-
-
-
-
-const createUrlValidation = async function (req, res, next) {
-
-    console.log(req.body)
-    let data = req.body;
-
-    let { longUrl } = data
-    // Validating empty body
-    if (!isValidRequestBody(data))
-        return res.status(400).send({ status: false, msg: "Body cannot be empty" });
-
-    if (isValidData(longUrl) != true)
-    {
-        let str= "longUrl " + isValidData(longUrl)
-        //console.log(str);
-        return res.status(400).send({ status: false, msg: str });
-    }
-    if (!isUrl(longUrl)) return res.status(400).send({ status: false, message: "Invalid format!! enter a valid URL" });
-
-    next()
-}
-
-
-
 
 
 const createUrl = async function (req, res) {
     try {
-        const longUrl = req.body.longUrl;
-        
+        const longUrl = req.body.longUrl.trim();
         const baseUrl = "http://localhost:3000/"
 
 
@@ -149,4 +118,4 @@ const getUrl = async function (req, res) {
 
 
 
-module.exports = { createUrlValidation, createUrl, getUrl }
+module.exports = { createUrl, getUrl, flushw }
