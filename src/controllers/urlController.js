@@ -46,7 +46,7 @@ function isUrl(x) {
 
 const createUrlValidation = async function (req, res, next) {
 
-
+    console.log(req.body)
     let data = req.body;
 
     let { longUrl } = data
@@ -72,6 +72,7 @@ const createUrlValidation = async function (req, res, next) {
 const createUrl = async function (req, res) {
     try {
         const longUrl = req.body.longUrl;
+        
         const baseUrl = "http://localhost:3000/"
 
 
@@ -114,12 +115,13 @@ const createUrl = async function (req, res) {
 
 const getUrl = async function (req, res) {
     try {
+        console.log(req.params)
         let urlCode = req.params.urlCode
         if (!shortId.isValid(urlCode)) return res.status(400).send({ status: false, message: "invalid format of the urlCode, i.e. it must be of length>5 & comprised of only[a-zA-Z0-9_-]" })
         let cahcedProfileData = await GET_ASYNC(`${urlCode}`)
         if (cahcedProfileData) {
             //console.log('From cache')
-            return res.status(302).redirect(JSON.parse(cahcedProfileData))
+            return res.status(302).redirect(cahcedProfileData)
         }
         else {
             let urlData = await urlModel.findOne({ urlCode: urlCode });
