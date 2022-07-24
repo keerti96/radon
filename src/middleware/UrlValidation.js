@@ -14,16 +14,17 @@ const isValidRequestBody = function (requestBody) {
 }
 
 const createUrlValidation = async function (req, res, next) {
-  
+
     let data = req.body;
-    let { longUrl } = data
+
     // Validating empty body
     if (!isValidRequestBody(data))
         return res.status(400).send({ status: false, msg: "Body cannot be empty" });
-    if (isValidData(longUrl) != true)
-   
-    {   
-        let str= "longUrl " + isValidData(longUrl)
+
+    //Validating longUrl field    
+    let { longUrl } = data
+    if (isValidData(longUrl) != true) {
+        let str = "longUrl " + isValidData(longUrl)
         //console.log(str);
         return res.status(400).send({ status: false, msg: str });
     }
@@ -32,4 +33,4 @@ const createUrlValidation = async function (req, res, next) {
     next()
 }
 
-module.exports= {createUrlValidation}
+module.exports = { createUrlValidation }
